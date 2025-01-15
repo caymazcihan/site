@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <!-- Ders Atama Formu -->
+        <div class="col-4">
+            <h1 class="text-center">Ders Atama</h1>
+            <form id="filter-form" action="/ders-atama" method="POST">
+                <!-- Sınıf Seçimi -->
+                <div class="form-group">
+                    <label for="sinif_secimi">Sınıf Seçimi</label>
+                    <select name="sinif_secimi" class="form-control filter-input" id="sinif_secimi" required>
+                        <option value="" {% if not filter_class %}selected{% endif %}>Tüm Sınıflar</option>
+                        {% for class in classes %}
+                        <option value="{{ class.id }}" {% if filter_class==class.id|string %}selected{% endif %}>
+                            {{ class.class_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Öğretmen Seçimi -->
+                <div class="form-group">
+                    <label for="ogretmen_secimi">Öğretmen Seçimi</label>
+                    <select name="ogretmen_secimi" class="form-control filter-input" id="ogretmen_secimi" required>
+                        <option value="" {% if not filter_teacher %}selected{% endif %}>Tüm Öğretmenler</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}" {% if filter_teacher==teacher.id|string %}selected{% endif %}>
+                            {{ teacher.name }} {{ teacher.surname }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Ders Seçimi -->
+                <div class="form-group">
+                    <label for="ders_secimi">Ders Seçimi</label>
+                    <select name="ders_secimi" class="form-control filter-input" id="ders_secimi" required>
+                        <option value="" {% if not filter_course %}selected{% endif %}>Tüm Dersler</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if filter_course==course.id|string %}selected{% endif %}>
+                            {{ course.course_name }} {{ course.weekly_hours }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success mt-4">Dersi Ata</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Programlar Tablosu -->
+        <div class="col-8">
+            <h1 class="text-center">Öğretmene Atanan Dersler</h1>
+            <p id="total-hours-label" class="text-center font-weight-bold">Toplam Haftalık Ders Saati: 0</p>
+            <table id="programlar-tablosu" class="table table-bordered table-striped table-hover table-sm">
+                <thead class="table-success" style="vertical-align: middle;">
+                    <tr>
+                        <th class="col-3">Ders Adı</th>
+                        <th class="col-3">Öğretmen</th>
+                        <th class="col-1">Sınıf</th>
+                        <th class="col-2">Haftalık Ders Saati</th>
+                        <th class="col-1">Yerleştirme Biçimi</th>
+                        <th class="col-1">Sil</th>
+                    </tr>
+                </thead>
+                <tbody id="programlar-tbody">
+                    {% for program in programlar %}
+                    <tr style="vertical-align: middle;">
+                        <td>{{ program.course.course_name }}</td>
+                        <td>{{ program.teacher.name }} {{ program.teacher.surname }}</td>
+                        <td>{{ program.class_.class_name }}</td>
+                        <td>{{ program.course.weekly_hours }}</td>
+                        <td>{{ program.course.distribution_format }}</td>
+                        <td>
+                            <a href="{{ url_for('delete_assignment', assignment_id=program.id) }}"
+                                class="btn btn-danger btn-sm">Sil</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Uygun bir kayıt bulunamadı.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterForm = document.getElementById("filter-form");
+        const sinifSecimi = document.getElementById("sinif_secimi");
+        const ogretmenSecimi = document.getElementById("ogretmen_secimi");
+        const dersSecimi = document.getElementById("ders_secimi");
+
+        const totalHoursLabel = document.getElementById("total-hours-label");
+
+        function calculateTotalHours() {
+            const tableBody = document.querySelector("#programlar-tbody");
+            const rows = tableBody.querySelectorAll("tr");
+            let totalHours = 0;
+
+            rows.forEach(row => {
+                const hoursCell = row.querySelector("td:nth-child(4)"); // 4. sütun: Haftalık Ders Saati
+                if (hoursCell && !isNaN(hoursCell.textContent.trim())) {
+                    totalHours += parseInt(hoursCell.textContent.trim());
+                }
+            });
+
+            totalHoursLabel.textContent = `Toplam Haftalık Ders Saati: ${totalHours}`;
+        }
+
+        // Sayfa yüklendiğinde toplamı hesapla
+        calculateTotalHours();
+
+        // Filtreleme işlemi sonrası toplamı güncelle
+        filterForm.addEventListener("change", function () {
+            const sinifSecimiValue = sinifSecimi.value;
+            const ogretmenSecimiValue = ogretmenSecimi.value;
+            const dersSecimiValue = dersSecimi.value;
+
+            const params = new URLSearchParams({
+                sinif_secimi: sinifSecimiValue,
+                ogretmen_secimi: ogretmenSecimiValue,
+                ders_secimi: dersSecimiValue
+            });
+
+            fetch(`/get-filtered-data?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector("#programlar-tbody");
+                    tableBody.innerHTML = "";
+
+                    if (data.length === 0) {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `<td colspan="6" class="text-center">Uygun bir kayıt bulunamadı.</td>`;
+                        tableBody.appendChild(row);
+                    } else {
+                        data.forEach(program => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                            <td>${program.course_name}</td>
+                            <td>${program.teacher_name}</td>
+                            <td>${program.class_name}</td>
+                            <td>${program.weekly_hours}</td>
+                            <td>${program.distribution_format}</td>
+                            <td>
+                                <a href="/ders-dagitimi-sil/${program.id}" class="btn btn-danger btn-sm">Sil</a>
+                            </td>
+                        `;
+                            tableBody.appendChild(row);
+                        });
+                    }
+
+                    // Filtre sonrası toplamı güncelle
+                    calculateTotalHours();
+                })
+                .catch(error => console.error('Hata:', error));
+        });
+    });
+
+</script>
+
+{% endblock %}

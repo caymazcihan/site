@@ -1,0 +1,243 @@
+/* Root değişkenler - tema renkleri */
+:root {
+    --primary-gradient: linear-gradient(135deg, #0062cc, #66b3ff);
+    --hover-gradient: linear-gradient(135deg, #0099ff, #00b3b3);
+    --navbar-height: 60px;
+    --button-shadow: 0px 5px 0px 0px #0056b3;
+    --hover-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar Temel Stili */
+.navbar {
+    height: var(--navbar-height);
+    background: var(--primary-gradient) !important;
+    padding: 0;
+    display: flex;
+    justify-content: space-between; /* İçerikleri arasına boşluk bırakır */
+    align-items: center; /* İçerikleri dikeyde ortalar */
+    width: 100%; /* Navbar'ın tam genişlikte olması için */
+}
+
+/* Navbar içeriği hizalama */
+.navbar .container-fluid {  /* container yerine container-fluid kullanıldı */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Navbar başlık */
+.navbar .navbar-brand {
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding-left: 1rem; /* Sol tarafta boşluk bırakır */
+   
+}
+
+/* Navbar menü butonları ortada */
+.navbar-nav {
+    display: flex;
+    justify-content: center;
+    flex-grow: 2; /* Ortaya odaklanması için */
+    margin: 0;
+}
+
+/* Sağdaki giriş/çıkış butonları */
+.navbar .ms-auto {
+    display: flex;
+    justify-content: end; /* Giriş çıkış butonlarını sola hizalar */
+}
+
+/* Mobile uyumlu navbar */
+@media (max-width: 991.98px) {
+    .navbar-nav {
+        flex-grow: 1; /* Menü butonlarının tüm alanı kullanmasını sağlar */
+    }
+
+    .navbar .navbar-brand {
+        padding-left: 0;
+    }
+
+    .navbar .ms-auto {
+        justify-content: flex-start;
+    }
+}
+
+/* Navbar buton stili */
+.nav-link {
+    background: var(--primary-gradient);
+    color: white !important;
+    border: none;
+    box-shadow: var(--button-shadow);
+    transition: all 0.2s ease;
+    padding: 8px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    height: 40px;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover efektleri */
+.nav-link:hover,
+.nav-link:focus {
+    background: var(--hover-gradient);
+    color: white !important;
+    box-shadow: var(--hover-shadow);
+    transform: translateY(3px);
+    outline: none;
+}
+
+/* Active durum */
+.nav-link.active {
+    background: var(--hover-gradient);
+    box-shadow: var(--hover-shadow);
+    transform: translateY(2px);
+}
+
+
+
+/* Başlık stilleri */
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* Form stilleri */
+.form-group {
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
+}
+
+.form-control {
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Buton stilleri */
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: var(--button-shadow);
+}
+
+.btn-primary:hover {
+    background: var(--hover-gradient);
+    transform: translateY(2px);
+    box-shadow: var(--hover-shadow);
+}
+
+/* Tablo stilleri */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: transparent;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.075);
+}
+
+/* Alert stilleri */
+.alert {
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #28a745, #34ce57);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #dc3545, #ef5464);
+    color: white;
+}
+
+/* Responsive tasarım */
+@media (max-width: 991.98px) {
+    .navbar {
+        height: auto;
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-nav {
+        margin: 0;
+        padding: 1rem 0;
+    }
+
+    .nav-link {
+        margin: 0.5rem 0;
+        width: 100%;
+    }
+
+    .table-responsive {
+        margin-bottom: 1rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table td, .table th {
+        min-width: 120px;
+    }
+}
+
+/* Yardımcı sınıflar */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Ders Dağıtım Sistemi">
+    <title>{{ page_title or "Ders Dağıtım Sistemi" }}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+</head>
+
+<body>
+
+<!-- Sabit Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-book-reader me-2"></i>Ders Dağıtım Sistemi
+            </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {% if 'username' in session %}
+        <div class="collapse navbar-collapse" id="navbarNav" >
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
+        		
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'home' }}" href="{{ url_for('home') }}">
+                        <i class="fas fa-home me-1"></i>Anasayfa
+                    </a>
+                </li>
+        		<li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'okul_bilgileri' }}" href="{{ url_for('okul_bilgileri') }}">
+                         <i class="fas fa-school me-1"></i></i>Okul Bilgileri
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'add_teacher' }}" href="{{ url_for('add_teacher') }}">
+                        <i class="fas fa-chalkboard-teacher me-1"></i>Öğretmen Ekle
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'ogretmen_programi' }}" href="{{ url_for('ogretmen_programi') }}">
+                        <i class="fas fa-calendar-alt me-1"></i>Öğretmen Program
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'add_class' }}" href="{{ url_for('add_class') }}">
+                        <i class="fas fa-school me-1"></i>Sınıf Ekle
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'add_course' }}" href="{{ url_for('add_course') }}">
+                        <i class="fas fa-book me-1"></i>Ders Ekle
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'assign_course' }}" href="{{ url_for('assign_course') }}">
+                        <i class="fas fa-tasks me-1"></i>Ders Atama
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'schedules' }}" href="{{ url_for('schedules') }}">
+                        <i class="fas fa-calendar-week me-1"></i>Programlar
+                    </a>
+                </li>
+            </ul>
+            <div class="ms-auto d-flex align-items-end">
+                <span class="text-light me-3">
+                    <i class="fas fa-user me-1"></i>{{ session['username'] }}
+                </span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt me-1"></i>Çıkış Yap
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="ms-auto d-flex align-items-end">
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">
+                <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-light">
+                <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+<div class="container mt-5 pt-4">
+</div>
+        <!-- Ana İçerik -->
+        {% block content %}
+        {% endblock %}
+
+  <!-- Flash Mesajları -->
+    <div class="container mt-5 pt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Custom JavaScript -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

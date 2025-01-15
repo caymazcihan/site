@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Okul Programı</h1>
+    <div class="row mt-4">
+        <!-- Form alanları -->
+        <div class="col-md-12">
+            <form method="POST" action="{{ url_for('okul_bilgileri') }}">
+                <div class="form-group">
+                    <label for="school_name">Okul Adı</label>
+                    <input type="text" class="form-control" id="school_name" name="school_name" value="{{ school_name or '' }}" placeholder="Okul adını giriniz">
+                </div>
+                <div class="form-group">
+                    <label for="school_email">E-posta</label>
+                    <input type="email" class="form-control" id="school_email" name="school_email" value="{{ school_email or '' }}" placeholder="Okul e-posta adresini giriniz">
+                </div>
+                <div class="form-group">
+                    <label for="school_principal">Okul Müdürü</label>
+                    <input type="text" class="form-control" id="school_principal" name="school_principal" value="{{ school_principal or '' }}" placeholder="Okul müdürünün adını giriniz">
+                </div>
+
+                <h3>Haftalık Çizelge</h3>
+                <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Saatler</th>
+                            {% for day in days %}
+                                <th>
+                                    {{ day|capitalize }}
+                                    <br>
+                                    <!-- Tümünü Kapat/Aç Butonları -->
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="toggleDay('{{ day }}')">Tümünü Kapat/Aç</button>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hour in hours %}
+                        <tr>
+                            <td>{{ hour }}. Saat</td>
+                            {% for day in days %}
+                            <td>
+                                <!-- Saat seçimi için checkbox -->
+                                <input type="checkbox" class="form-check-input" id="{{ day }}-{{ hour }}" name="{{ day }}-{{ hour }}" {% if schedule[day][hour] %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ day }}-{{ hour }}">Açık</label>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-center mt-3">
+                <button type="submit" class="btn btn-warning " style="width: 300px;">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gün bazında tüm saatleri açıp kapama fonksiyonu
+    function toggleDay(day) {
+        const checkboxes = document.querySelectorAll(`#${day}-1, #${day}-2, #${day}-3, #${day}-4, #${day}-5, #${day}-6, #${day}-7, #${day}-8, #${day}-9, #${day}-10`);
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        // Tüm checkbox'ların durumunu tersine çevir
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+    }
+</script>
+
+{% endblock %}

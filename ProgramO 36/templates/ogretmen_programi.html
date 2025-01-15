@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Öğretmen Programı</h1>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <br>
+            <!-- Okul Programını Öğretmenlere Ata Butonu -->
+            <form method="POST" id="assign-form" action="{{ url_for('assign_school_schedule_to_teachers') }}">
+                <button type="submit" class="btn btn-success mb-3"
+                    onclick="return confirm('Tüm öğretmen programları değişecek. Emin misiniz?')">Okul Programını
+                    Öğretmenlere Ata</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <form method="GET" action="{{ url_for('ogretmen_programi') }}">
+                <div class="row">
+                    <!-- Öğretmen Seçimi -->
+                    <div class="form-group p-3 bg-warning text-dark rounded">
+                        <label for="teacher_select">Öğretmeni Seçin:</label>
+                        <select id="teacher_select" name="teacher_id" class="form-control  bg-light"
+                            onchange="this.form.submit()">
+                            <option value="">Öğretmen Seçin</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}" {% if teacher.id==selected_teacher_id|int %}selected{%
+                                endif %}>{{ teacher.name }} {{ teacher.surname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12">
+            <!-- Diğer form içeriği (tablo vs.) -->
+            <h3>Haftalık Çizelge</h3>
+            <form method="POST" action="{{ url_for('ogretmen_programi') }}">
+                <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Saatler</th>
+                            {% for day in open_hours_by_day.keys() %}
+                            <th>{{ day|capitalize }}
+                                <br>
+                                <!-- Tümünü Kapat/Aç Butonları -->
+                                <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="toggleDay('{{ day }}')">Tümünü Kapat/Aç</button>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(max_hours) %}
+                        <tr>
+                            <!-- Burada open_hours_by_day'den gelen saat bilgisini kullanıyoruz -->
+                            <td>{{ i+1 }}. Saat</td>
+                            {% for day in open_hours_by_day.keys() %}
+                            <td>
+                                {% if i < open_hours_by_day[day]|length %} {% set hour=open_hours_by_day[day][i] %} {%
+                                    if selected_teacher_id %} <input type="checkbox" class="form-check-input"
+                                    id="{{ day }}-{{ hour }}" name="{{ day }}-{{ hour }}" {% if
+                                    teacher_schedule_data[day][hour] %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ day }}-{{ hour }}">Açık</label>
+                                    {% else %}
+                                    <input type="checkbox" class="form-check-input" id="{{ day }}-{{ hour }}"
+                                        name="{{ day }}-{{ hour }}" checked>
+                                    <label class="form-check-label" for="{{ day }}-{{ hour }}">Açık</label>
+                                    {% endif %}
+                                    {% else %}
+                                    <!--  Eğer saat yoksa boş bir hücre -->
+                                    {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if selected_teacher_id %}
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-warning " style="width: 300px;">Kaydet</button>
+                    <input type="hidden" name="teacher_id" value="{{ selected_teacher_id }}">
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gün bazında tüm saatleri açıp kapama fonksiyonu
+    function toggleDay(day) {
+        // Tüm saatler için olan checkbox'ları seç
+        const checkboxes = document.querySelectorAll('[id^="' + day + '-"]');
+        // Tüm checkbox'ların şu anki durumunu kontrol et (hepsi seçili mi?)
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        // Tüm checkbox'ların durumunu tersine çevir (seçiliyse kaldır, seçili değilse seç)
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <!-- Ders Ekleme veya Düzenleme Formu -->
+        <div class="col-4">
+            <h1 class="text-center">{{ 'Ders Düzenle' if course_to_edit else 'Ders Ekle' }}</h1>
+            <form action="{{ url_for('edit_course', course_id=course_to_edit.id) if course_to_edit else url_for('add_course') }}"  method="POST">
+                <div class="form-group">
+                    <label for="ders_adi">Ders Adı</label>
+                    <input type="text" class="form-control" id="ders_adi" name="ders_adi" value="{{ course_to_edit.course_name if course_to_edit else '' }}" onblur="this.value = this.value.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');" required>
+                </div>
+                <div class="form-group">
+                    <label for="ders_kisa_adi">Ders Kısa Adı</label>
+                    <input type="text" class="form-control" id="ders_kisa_adi" name="ders_kisa_adi" value="{{ course_to_edit.short_name if course_to_edit else '' }}" oninput="this.value = this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group">
+                    <label for="haftalik_ders_sayisi">Haftalık Ders Saati</label>
+                    <input type="number" class="form-control" id="haftalik_ders_sayisi" name="haftalik_ders_sayisi" value="{{ course_to_edit.weekly_hours if course_to_edit else '' }}" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="yerlestirme_bicimi">Yerleştirme Biçimi</label>
+                    <input type="text" class="form-control" id="yerlestirme_bicimi" name="yerlestirme_bicimi" value="{{ course_to_edit.distribution_format if course_to_edit else '' }}" oninput="this.value = this.value.replace(/[^0-9+]/g, '');" required>
+                </div>
+		
+                <div class="text-center mt-3">
+        			<button type="submit" class="btn btn-success me-2">{{ 'Güncelle' if course_to_edit else 'Ders Ekle' }}</button>
+        			{% if course_to_edit %}
+           			 <a href="{{ url_for('add_course') }}" class="btn btn-secondary">Vazgeç</a>
+       			 	{% endif %}
+    		</div>
+		
+            </form>
+
+           </div>
+
+        <!-- Mevcut Dersler -->
+        <div class="col-7">
+            <h1 class="text-center">Mevcut Dersler</h1>
+            <table class="table table-bordered table-striped table-hover table-sm">
+                <thead class="table-success" style="vertical-align: middle;">
+                    <tr>
+                        <th class="col-4">Ders Adı</th>
+                        <th class="col-2">Ders Kısa Adı</th>
+                        <th class="col-2">Haftalık Ders Saati</th>
+                        <th class="col-2">Yerleştirme Biçimi</th>
+                        <th class="col-4">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                            {% for course in courses %}
+                     <tr style="vertical-align: middle;">
+                         <td>{{ course.course_name }}</td>
+                         <td>{{ course.short_name }}</td>
+                         <td>{{ course.weekly_hours }}</td>
+                         <td>{{ course.distribution_format }}</td>
+                         <td>
+                          <a href="{{ url_for('edit_course', course_id=course.id) }}" class="btn btn-warning btn-sm ">Düzenle</a>
+                          <a href="{{ url_for('delete_course', course_id=course.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Emin misiniz?')">Sil</a>
+                        </td>
+                   </tr>
+                  {% else %}
+                 <tr>
+                <td colspan="5" class="text-center">Henüz ders bulunmamaktadır.</td>
+                  </tr>
+                {% endfor %}
+                  </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    // Haftalık ders saati ve yerleştirme biçimi kontrolü
+    const weeklyHoursInput = document.getElementById('haftalik_ders_sayisi');
+    const distributionFormatInput = document.getElementById('yerlestirme_bicimi');
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', (event) => {
+        const weeklyHours = parseInt(weeklyHoursInput.value);
+        const distributionFormat = distributionFormatInput.value;
+
+        const numbers = distributionFormat.split('+').map(Number);
+        const sumOfNumbers = numbers.reduce((sum, num) => sum + num, 0);
+
+        if (weeklyHours !== sumOfNumbers) {
+            event.preventDefault();
+            alert('Haftalık ders saati ile yerleştirme biçimindeki sayıların toplamı eşit olmalıdır!');
+        }
+    });
+</script>
+{% endblock %}

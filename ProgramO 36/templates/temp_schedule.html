@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geçici Ders Programı</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Geçici Ders Programı</h1>
+        
+        {% if temp_schedule %}
+        
+          <!-- Öğretmen Bazında Tablolar -->
+        <h2>Öğretmen Bazında Program</h2>
+         {% for teacher_id, schedule in temp_schedule_by_teacher.items() %}
+              <h3>Öğretmen ID: {{ teacher_id }}</h3>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Saat</th>
+                            {% for day in DAYS %}
+                                <th>{{ day }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for hour in HOURS %}
+                           <tr>
+                                <td>{{ hour }}</td>
+                               {% for day in DAYS %}
+                                  <td>
+                                      {% if schedule[day][hour] %}
+                                          {{ schedule[day][hour].course_id }} - {{ schedule[day][hour].class_id }}
+                                      {% else %}
+                                         -
+                                      {% endif %}
+                                  </td>
+                              {% endfor %}
+                           </tr>
+                       {% endfor %}
+
+                   </tbody>
+                 </table>
+               </div>
+           {% endfor %}
+        
+           <!-- Sınıf Bazında Tablolar -->
+           <h2>Sınıf Bazında Program</h2>
+            {% for class_id, schedule in temp_schedule_by_class.items() %}
+             <h3>Sınıf ID: {{ class_id }}</h3>
+            <div class="table-responsive">
+                 <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Saat</th>
+                            {% for day in DAYS %}
+                                <th>{{ day }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                         {% for hour in HOURS %}
+                           <tr>
+                                <td>{{ hour }}</td>
+                               {% for day in DAYS %}
+                                  <td>
+                                      {% if schedule[day][hour] %}
+                                          {{ schedule[day][hour].course_id }} - {{ schedule[day][hour].teacher_id }}
+                                      {% else %}
+                                         -
+                                      {% endif %}
+                                  </td>
+                              {% endfor %}
+                           </tr>
+                       {% endfor %}
+                   </tbody>
+                </table>
+              </div>
+            {% endfor %}
+        
+        {% else %}
+        <p>Henüz oluşturulmuş bir program bulunmamaktadır.</p>
+        {% endif %}
+        
+         <form method="post" action="{{ url_for('create_schedule') }}">
+             <button type="submit" class="btn btn-primary">Programı Kaydet</button>
+          </form>
+        
+        <a href="{{ url_for('schedules') }}" class="btn btn-secondary mt-3">Geri Dön</a>
+        
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

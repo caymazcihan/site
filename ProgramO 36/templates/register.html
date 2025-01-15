@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+<div class="row justify-content-center">
+	<!-- Register Form -->
+        <div class="col-4">
+
+    <h2 class="text-center">Kayıt Ol</h2>
+    <form action="/register" method="POST" class="mt-4">
+        <div class="form-group">
+            <label for="email">E-posta</label>
+            <input type="email" class="form-control {% if error_email %}is-invalid{% endif %}" id="email" name="email" required value="{{ request.form.email }}">
+            {% if error_email %}
+                <div class="invalid-feedback">
+                    {{ error_email }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="username">Kullanıcı Adı</label>
+            <input type="text" class="form-control {% if error_username %}is-invalid{% endif %}" id="username" name="username" required value="{{ request.form.username }}">
+            {% if error_username %}
+                <div class="invalid-feedback">
+                    {{ error_username }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="password">Şifre</label>
+            <input type="password" class="form-control {% if error_password %}is-invalid{% endif %}" id="password" name="password" required>
+            {% if error_password %}
+                <div class="invalid-feedback">
+                    {{ error_password }}
+                </div>
+            {% endif %}
+        </div>
+	<div class="text-center mt-3">
+       		 <button type="submit" class="btn btn-success ">Kayıt Ol</button>
+	</div>
+    </form>
+</div>
+</div>
+</div>
+<!-- Flash Mesajları -->
+<div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+{% endblock %}

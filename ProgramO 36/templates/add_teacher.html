@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <!-- Öğretmen Ekleme veya Düzenleme Formu Sol Taraf -->
+        <div class="col-4">
+            <h1 class="text-center">{{ 'Öğretmen Düzenle' if teacher_to_edit else 'Öğretmen Ekle' }}</h1>
+            <form action="{{ url_for('edit_teacher', teacher_id=teacher_to_edit.id) if teacher_to_edit else url_for('add_teacher') }}" method="POST">
+                <div class="form-group">
+                    <label for="ad">Ad</label>
+                    <input type="text" class="form-control" name="ad" value="{{ teacher_to_edit.name if teacher_to_edit else '' }}" onblur="this.value = this.value.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');" required>
+                </div>
+                <div class="form-group">
+                    <label for="soyad">Soyad</label>
+                    <input type="text" class="form-control" name="soyad" value="{{ teacher_to_edit.surname if teacher_to_edit else '' }}" onblur="this.value = this.value.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-posta</label>
+                    <input type="email" class="form-control" name="email" value="{{ teacher_to_edit.email if teacher_to_edit else '' }}" oninput="this.value = this.value.toLowerCase()">
+                </div>
+                <div class="form-group">
+                    <label for="brans">Branş</label>
+                    <input type="text" class="form-control" name="brans" value="{{ teacher_to_edit.branch if teacher_to_edit else '' }}" onblur="this.value = this.value.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');" required>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-success">{{ 'Güncelle' if teacher_to_edit else 'Öğretmen Ekle' }}</button>
+                    {% if teacher_to_edit %}
+                    <a href="{{ url_for('add_teacher') }}" class="btn btn-secondary">Vazgeç</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Öğretmen Listeleme ve Düzenleme Sağ Taraf -->
+        <div class="col-7">
+            <h1 class="text-center">Öğretmenler</h1>
+            <table class="table table-bordered table-striped table-sm">
+                <thead class="table-success">
+                    <tr>
+                        <th>Ad</th>
+                        <th>Soyad</th>
+                        <th>Email</th>
+                        <th>Branş</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr style="vertical-align: middle;">
+                        <td>{{ teacher.name }}</td>
+                        <td>{{ teacher.surname }}</td>
+                        <td>{{ teacher.email }}</td>
+                        <td>{{ teacher.branch }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_teacher', teacher_id=teacher.id) }}" class="btn btn-warning btn-sm">Düzenle</a>
+                            <a href="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Henüz öğretmen bulunmamaktadır.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+</script>
+{% endblock %}

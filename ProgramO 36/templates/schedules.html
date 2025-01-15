@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-3 justify-content-center">
+        <div class="text-center">
+            <h1>Programlar</h1>
+            <form method="POST" id="create_schedule-form" action="/create_schedule_genetic">
+                <button type="submit" class="btn btn-success mt-3 mb-3" onclick="showLoading()">Ders Programlarını Yap
+                </button>
+            </form>
+            <div id="loading-animation" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p class="mt-2">Lütfen bekleyin...</p>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-center">Sınıf Bazlı Programlar</h2>
+            {% if schedule_by_class %}
+                {% for class_id, class_data in schedule_by_class.items() %}
+                    <h3>{{ class_data.class_name }}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Gün</th>
+                                {% for hour in open_hours_by_day.values()|first %}
+                                    <th>{{ hour }}. Saat</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for day, hours in open_hours_by_day.items() %}
+                                <tr>
+                                    <th>{{ day|title }}</th>
+                                    {% for hour in hours %}
+                                        <td>
+                                            {% set schedule_entry = class_data.schedule.get(day, {}).get(hour) %}
+                                            {% if schedule_entry %}
+                                                {{ schedule_entry.teacher_name }} - {{ schedule_entry.course_name }}
+                                            {% else %}
+                                                ------------
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center">Henüz oluşturulmuş bir program bulunmamaktadır.</p>
+            {% endif %}
+        </div>
+        <!-- 
+          <div>
+          <h2 class="text-center mt-5">Öğretmen Bazlı Programlar</h2>
+          {% if schedule_by_teacher %}
+            {% for teacher_id, teacher_data in schedule_by_teacher.items() %}
+              <h3>{{ teacher_data.teacher_name }}</h3>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Gün</th>
+                      {% for hour in open_hours_by_day.values()|first %}
+                        <th>{{ hour }}. Saat</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for day, hours in open_hours_by_day.items() %}
+                      <tr>
+                        <th>{{ day|title }}</th>
+                        {% for hour in hours %}
+                          <td>
+                            {% set schedule_entry = teacher_data.schedule.get(day, {}).get(hour) %}
+                            {% if schedule_entry %}
+                              {{ schedule_entry.class_name }} - {{ schedule_entry.course_name }}
+                            {% else %}
+                              ------------
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-center">Henüz oluşturulmuş bir program bulunmamaktadır.</p>
+          {% endif %}
+        </div>
+        -->
+        {% if unplaced_assignments %}
+            <div class="mt-4">
+                <h3 class="text-danger text-center">Yerleştirilemeyen Dersler</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Ders</th>
+                            <th>Öğretmen</th>
+                            <th>Sınıf</th>
+                            <th>Gereken Saat</th>
+                            <th>Yerleştirilen Saat</th>
+                            <th>Eksik Saat</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for unplaced in unplaced_assignments %}
+                            <tr>
+                                <td>{{ unplaced.course_name }}</td>
+                                <td>{{ unplaced.teacher_name }}</td>
+                                <td>{{ unplaced.class_name }}</td>
+                                <td>{{ unplaced.weekly_hours }}</td>
+                                <td>{{ unplaced.placed_hours }}</td>
+                                <td class="text-danger fw-bold">{{ unplaced.weekly_hours - unplaced.placed_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="1" class="text-start"><strong>Toplam Yerleştirilemeyen Ders:</strong></td>
+                                <td class="text">
+                                    <strong>
+                                        {{ unplaced_assignments | length }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="1" class="text-start"><strong>Toplam Eksik Saat:</strong></td>
+                                <td class="text-danger">
+                                    <strong>
+                                        {{ unplaced_assignments | sum(attribute='weekly_hours') - unplaced_assignments | sum(attribute='placed_hours') }}
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('create_schedule-form').addEventListener('submit', function () {
+            showLoading()
+        })
+
+        function showLoading() {
+            document.getElementById('loading-animation').style.display = 'block'
+        }
+    </script>
+{% endblock %}

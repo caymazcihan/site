@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-center mt-5">
+    <div class="card-body">
+        <h1 class="card-title">Hoşgeldiniz!</h1>
+        {% if 'username' in session %}
+            <p class="card-text">Merhaba, <strong>{{ session['username'] }}</strong>! Ders Dağıtım Sistemi'ne hoş geldiniz. 
+            {% if session['role'] == 'admin' %}
+                <span class="badge badge-danger">Admin</span>
+            {% elif session['role'] == 'teacher' %}
+                <span class="badge badge-success">Öğretmen</span>
+            {% else %}
+                <span class="badge badge-info">Kullanıcı</span>
+            {% endif %}
+            <br> Lütfen menüyü kullanarak işlemlerinizi gerçekleştirin.</p>
+        {% else %}
+            <p class="card-text">Ders Dağıtım Sistemi'ne hoş geldiniz. Lütfen menüyü kullanarak işlemlerinizi gerçekleştirin.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

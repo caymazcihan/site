@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3" justify-content-center>
+    <div class="row justify-content-center">
+        <!-- Sınıf Ekleme Formu -->
+        <div class="col-3">
+            <h1 class="text-center">{{ class_to_edit and 'Sınıf Düzenle' or 'Sınıf Ekle' }}</h1>
+            <form action="{{ class_to_edit and url_for('edit_class', class_id=class_to_edit.id) or url_for('add_class') }}"  method="POST">
+                <div class="form-group">
+                    <label for="sinif_adi">Sınıf Adı</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="sinif_adi" 
+                        name="sinif_adi" 
+                        value="{{ class_to_edit and class_to_edit.class_name or '' }}" 
+                        required 
+                        pattern="[A-Za-z0-9]+"
+                        oninput="this.value = this.value.toUpperCase()"
+                        title="Sadece harf ve sayılar girilebilir.">
+                </div>
+		
+		<div class="text-center mt-3">
+                	<button type="submit" class="btn btn-success">
+                  	  {{ class_to_edit and 'Sınıfı Güncelle' or 'Sınıf Ekle' }}
+                	</button>
+                	{% if class_to_edit %}
+                	<a href="{{ url_for('add_class') }}" class="btn btn-secondary">Vazgeç</a>
+                	{% endif %}
+		</div>
+            </form>
+
+        </div>
+
+        <!-- Mevcut Sınıflar -->
+        <div class="col-3">
+            <h1 class="text-center">Mevcut Sınıflar</h1>
+                <table class="table table-bordered table-striped table-hover table-auto table-sm">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Sınıf Adı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for class_ in classes %}
+                        <tr style="vertical-align: middle;">
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ class_.class_name }}</td>
+                            <td class="text-center">
+                                <a href="{{ url_for('edit_class', class_id=class_.id) }}" class="btn btn-warning btn-sm mr-1">Düzenle</a>
+                                <a href="{{ url_for('delete_class', class_id=class_.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Bu sınıfı silmek istediğinizden emin misiniz?')">Sil</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center">Henüz sınıf bulunmamaktadır.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
